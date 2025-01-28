@@ -7,60 +7,201 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# API de Gerenciamento de Colaboradores
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Esta aplicação é uma API para gerenciar colaboradores de diferentes empresas, desenvolvida em Laravel. A API permite cadastrar empresas, colaboradores, fazer upload de arquivos CSV para adicionar colaboradores em massa, e consultar colaboradores com filtros específicos.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos do Projeto
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP**: 8.3 ou superior
+- **Composer**: 2.0 ou superior
+- **MySQL**: 8.0 ou superior
+- **Node.js** (opcional, para compilar assets caso necessário)
+- **Redis** (para filas de processamento em background)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Instalação do Projeto
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Clone o Repositório
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone git@github.com:Paullolo18/test-winx.git
+cd test-winx
+```
 
-## Laravel Sponsors
+### 2. Instale as Dependências
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### Instale as dependências do PHP:
+```bash
+composer install
+```
 
-### Premium Partners
+#### Instale as dependências do Node.js (se necessário):
+```bash
+npm install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 3. Configure o Arquivo `.env`
 
-## Contributing
+Copie o arquivo de exemplo `.env.example` para criar seu arquivo `.env`:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+```
 
-## Code of Conduct
+Edite o arquivo `.env` para configurar os seguintes detalhes:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **Banco de Dados**:
+  ```env
+  DB_CONNECTION=mysql
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_DATABASE=seu_banco_de_dados
+  DB_USERNAME=seu_usuario
+  DB_PASSWORD=sua_senha
+  ```
 
-## Security Vulnerabilities
+- **Configuração de Filas (Redis)**:
+  ```env
+  QUEUE_CONNECTION=redis
+  REDIS_HOST=127.0.0.1
+  REDIS_PASSWORD=null
+  REDIS_PORT=6379
+  ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Gere a Chave da Aplicação
 
-## License
+```bash
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5. Configure as Migrações do Banco de Dados
+
+Execute as migrações para criar as tabelas necessárias:
+
+```bash
+php artisan migrate
+```
+
+---
+
+## Configuração de Filas
+
+Certifique-se de que o Redis está instalado e rodando. No Linux, você pode instalar com:
+
+```bash
+sudo apt update
+sudo apt install redis-server
+```
+
+Para iniciar o Redis:
+```bash
+sudo systemctl start redis
+```
+
+Para processar filas em background:
+```bash
+php artisan queue:work
+```
+
+---
+
+## Rodando o Sistema Localmente
+
+Inicie o servidor de desenvolvimento do Laravel:
+
+```bash
+php artisan serve
+```
+
+A aplicação estará acessível em: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## Como Executar os Testes
+
+Execute os testes automatizados com:
+
+```bash
+php artisan test
+```
+
+Os testes cobrem os seguintes cenários:
+- Registro e autenticação de usuários
+- Criação de empresas
+- Upload de arquivos CSV para colaboradores
+- Listagem e filtragem de colaboradores
+
+---
+
+## Rotas Disponíveis
+
+### Rotas Públicas
+
+- **Registrar Usuário e Empresa**: `POST /api/register`
+- **Login**: `POST /api/login`
+
+### Rotas Protegidas (Requer Autenticação via Bearer Token)
+
+- **Logout**: `POST /api/logout`
+- **Cadastrar Empresa**: `POST /api/empresas`
+- **Listar Empresas**: `GET /api/empresas`
+- **Fazer Upload de CSV**: `POST /api/upload-csv`
+- **Listar Colaboradores**: `GET /api/colaboradores`
+- **Filtrar Colaboradores**: `GET /api/colaboradores?nome=...&cargo=...&data_admissao=...`
+- **Ver Detalhes do Colaborador**: `GET /api/colaboradores/{id}`
+
+---
+
+## Estrutura do Projeto
+
+### Diretórios Principais
+
+- **`app/Models`**: Contém os modelos `User`, `Empresa` e `Colaborador`.
+- **`app/Http/Controllers`**: Contém os controladores responsáveis pelas ações da API.
+- **`app/Jobs`**: Contém o job `ProcessCsvJob` para processar uploads CSV em background.
+- **`routes/api.php`**: Definição das rotas da API.
+
+### Outros Arquivos Importantes
+
+- **`.env`**: Configurações específicas do ambiente (banco de dados, filas, etc.).
+- **`tests/Feature`**: Contém os testes automatizados para as principais funcionalidades.
+
+---
+
+## Exemplo de Uso da API
+
+- **Registro de Usuário e Empresa**:
+  ```json
+  POST /api/register
+  {
+      "name": "Admin Empresa",
+      "email": "admin@empresa.com",
+      "password": "123456",
+      "password_confirmation": "123456",
+      "empresa": {
+          "nome": "Minha Empresa",
+          "email": "empresa@example.com",
+          "cnpj": "12345678000195"
+      }
+  }
+  ```
+
+- **Upload de CSV**:
+  ```
+  POST /api/upload-csv
+  Authorization: Bearer {token}
+  File: colaboradores.csv
+  ```
+
+---
+
+## Observações
+
+Certifique-se de que as permissões da pasta `storage/` estão configuradas corretamente:
+
+```bash
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+
